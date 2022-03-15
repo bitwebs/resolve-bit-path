@@ -1,4 +1,4 @@
-const MANIFEST_LOCATION = '/dat.json'
+const MANIFEST_LOCATION = '/bit.json'
 const CHECK_PATHS = [
   path => path,
   path => `${path}index.html`,

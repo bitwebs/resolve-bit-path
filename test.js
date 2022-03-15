@@ -1,4 +1,4 @@
-const resolveDatPath = require('.')
+const resolveBitPath = require('.')
 const test = require('tape')
 const ScopedFS = require('scoped-fs')
 const tmp = require('tmp')
@@ -19,7 +19,7 @@ const { randomBytes } = require('crypto')
     try {
       const fs = new ScopedFS(folder)
       await prepareTestFiles(fs, all.slice(index))
-      matchesFile(t, await resolveDatPath(fs, 'test'), file)
+      matchesFile(t, await resolveBitPath(fs, 'test'), file)
     } finally {
       cleanup()
     }
@@ -30,10 +30,10 @@ const { randomBytes } = require('crypto')
       const fs = new ScopedFS(folder)
       await prepareTestFiles(fs, all.slice(index).map(file => `webr/${file}`))
       await prepareTestFiles(fs, all.slice(index))
-      fs.writeFileSync('dat.json', JSON.stringify({
+      fs.writeFileSync('bit.json', JSON.stringify({
         web_root: '/webr'
       }))
-      matchesFile(t, await resolveDatPath(fs, 'test'), `webr/${file}`)
+      matchesFile(t, await resolveBitPath(fs, 'test'), `webr/${file}`)
     } finally {
       cleanup()
     }
@@ -45,7 +45,7 @@ test('Test resolving to /test folder', async t => {
   try {
     const fs = new ScopedFS(folder)
     await mkdirP(fs, 'test')
-    matchesDir(t, await resolveDatPath(fs, 'test'), 'test')
+    matchesDir(t, await resolveBitPath(fs, 'test'), 'test')
   } finally {
     cleanup()
   }
@@ -55,7 +55,7 @@ test('Test 404 to /not-found folder', async t => {
   const { folder, cleanup } = tmpdir()
   try {
     const fs = new ScopedFS(folder)
-    await rejects(t, () => resolveDatPath(fs, 'test'), 'Not Found')
+    await rejects(t, () => resolveBitPath(fs, 'test'), 'Not Found')
   } finally {
     cleanup()
   }
@@ -65,11 +65,11 @@ test('Test fallback', async t => {
   const { folder, cleanup } = tmpdir()
   try {
     const fs = new ScopedFS(folder)
-    fs.writeFileSync('dat.json', JSON.stringify({
+    fs.writeFileSync('bit.json', JSON.stringify({
       fallback_page: '404'
     }))
     fs.writeFileSync('404', 'dummy content')
-    matchesFile(t, await resolveDatPath(fs, 'test'), '404')
+    matchesFile(t, await resolveBitPath(fs, 'test'), '404')
   } finally {
     cleanup()
   }
@@ -79,11 +79,11 @@ test('Test fallback', async t => {
   const { folder, cleanup } = tmpdir()
   try {
     const fs = new ScopedFS(folder)
-    fs.writeFileSync('dat.json', JSON.stringify({
+    fs.writeFileSync('bit.json', JSON.stringify({
       fallback_page: '404'
     }))
     fs.writeFileSync('404', 'dummy content')
-    matchesFile(t, await resolveDatPath(fs, 'test'), '404')
+    matchesFile(t, await resolveBitPath(fs, 'test'), '404')
   } finally {
     cleanup()
   }
@@ -93,13 +93,13 @@ test('Test webroot fallback', async t => {
   const { folder, cleanup } = tmpdir()
   try {
     const fs = new ScopedFS(folder)
-    fs.writeFileSync('dat.json', JSON.stringify({
+    fs.writeFileSync('bit.json', JSON.stringify({
       web_root: '/webr',
       fallback_page: '404'
     }))
     await mkdirP(fs, 'webr')
     fs.writeFileSync('webr/404', 'dummy content')
-    matchesFile(t, await resolveDatPath(fs, 'test'), 'webr/404')
+    matchesFile(t, await resolveBitPath(fs, 'test'), 'webr/404')
   } finally {
     cleanup()
   }
